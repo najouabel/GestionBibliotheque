@@ -24,8 +24,8 @@ public class ServiceLivre implements InterfaceLivre {
                 preparedStatement.setString(3, livre.getAuteur());
                 preparedStatement.setString(4, livre.getStatut() != null ? livre.getStatut().name() : "DefaultStatut");
 
-                int rowsAffected = preparedStatement.executeUpdate();
-                if (rowsAffected > 0) {
+                int insertedRows = preparedStatement.executeUpdate();
+                if (insertedRows > 0) {
                     return livre;
                 } else {
                     return null;
