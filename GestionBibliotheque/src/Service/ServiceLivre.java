@@ -27,10 +27,21 @@ public class ServiceLivre implements InterfaceLivre {
                 preparedStatement.setString(3, livre.getAuteur());
                 preparedStatement.setString(4, livre.getStatut() != null ? livre.getStatut().name() : "DefaultStatut");
 
+<<<<<<< HEAD
                 preparedStatement.executeUpdate();
 
             } catch (SQLException se) {
                 se.printStackTrace();
+=======
+                int insertedRows = preparedStatement.executeUpdate();
+                if (insertedRows > 0) {
+                    return livre;
+                } else {
+                    return null;
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+>>>>>>> 5da0968fbde307b376ba45850259beb136373f3b
                 return null;
             } finally {
                 try {
