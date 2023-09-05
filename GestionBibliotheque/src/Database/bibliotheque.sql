@@ -32,3 +32,34 @@ CREATE TABLE emprunt (
                          FOREIGN KEY (emprunteur_id) REFERENCES emprunteur(Numero_membre),
                          FOREIGN KEY (livre_isbn) REFERENCES livre(isbn)
 );
+
+CREATE TRIGGER emprunt_livre
+    AFTER INSERT ON emprunt
+    FOR EACH ROW
+BEGIN
+    UPDATE livre
+    SET statut = 'emprunté'
+    WHERE isbn = NEW.livre_isbn;
+END;
+
+CREATE TRIGGER perte_livre
+    AFTER INSERT ON emprunt
+    FOR EACH ROW
+BEGIN
+    IF NEW.date_retour IS NULL THEN
+    UPDATE livre
+    SET statut = 'perdu'
+    WHERE isbn = NEW.livre_isbn;
+END IF;
+END;
+
+CREATE TRIGGER retour_livre
+    AFTER UPDATE ON emprunt
+    FOR EACH ROW
+BEGIN
+    IF NEW.date_retour IS NOT NULL THEN
+    UPDATE livre
+    SET statut = 'disponible'
+    WHERE isbn = NEW.livre_isbn;
+END IF;
+END;
