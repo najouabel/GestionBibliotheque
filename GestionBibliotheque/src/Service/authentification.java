@@ -11,9 +11,9 @@ public class authentification {
     boolean authenticate() {
         Scanner scanner = new Scanner(System.in);
 
-        System.out.print("Enter librarian username: ");
-        String username = scanner.nextLine();
-        System.out.print("Enter librarian password: ");
+        System.out.print("Enter nom: ");
+        String nom = scanner.nextLine();
+        System.out.print("Enter password: ");
         String password = scanner.nextLine();
 
 
@@ -22,12 +22,12 @@ public class authentification {
             try {
                 String query = "SELECT * FROM bibliothecaire WHERE nom_bibliothecaire = ? AND pass_bibliothecaire = ?";
                 PreparedStatement preparedStatement = con.prepareStatement(query);
-                preparedStatement.setString(1, username);
+                preparedStatement.setString(1, nom);
                 preparedStatement.setString(2, password);
                 ResultSet resultSet = preparedStatement.executeQuery();
 
                 if (resultSet.next()) {
-                    bibliothecaire authenticatedUser = new bibliothecaire(username, password);
+                    bibliothecaire authenticatedUser = new bibliothecaire(nom, password);
                     return true;
                 }
             } catch (SQLException e) {

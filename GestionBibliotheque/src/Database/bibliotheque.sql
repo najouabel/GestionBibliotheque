@@ -24,12 +24,11 @@ CREATE TABLE emprunteur (
 
 CREATE TABLE emprunt (
                          id INT AUTO_INCREMENT PRIMARY KEY,
-                         emprunteur_id INT,
+                         Numero_membre INT,
                          livre_isbn VARCHAR(20),
                          date_emprunt DATE,
                          date_retour DATE,
-                         date_retour_prevu DATE,
-                         FOREIGN KEY (emprunteur_id) REFERENCES emprunteur(Numero_membre),
+                         FOREIGN KEY (Numero_membre) REFERENCES emprunteur(Numero_membre),
                          FOREIGN KEY (livre_isbn) REFERENCES livre(isbn)
 );
 
@@ -46,12 +45,21 @@ CREATE TRIGGER perte_livre
     AFTER INSERT ON emprunt
     FOR EACH ROW
 BEGIN
-    IF NEW.date_retour IS NULL THEN
+    DECLARE date_emprunt DATE;
+    DECLARE date_retour_prevue DATE;
+    DECLARE duree_emprunt INT;
+
+    SELECT NEW.date_emprunt, DATE_ADD(NEW.date_emprunt, INTERVAL 15 DAY) INTO date_emprunt, date_retour_prevue;
+
+    SET duree_emprunt = DATEDIFF(date_retour_prevue, NEW.date_emprunt);
+
+    IF NEW.date_retour IS NULL AND duree_emprunt >= 15 THEN
     UPDATE livre
     SET statut = 'perdu'
     WHERE isbn = NEW.livre_isbn;
 END IF;
 END;
+
 
 CREATE TRIGGER retour_livre
     AFTER UPDATE ON emprunt

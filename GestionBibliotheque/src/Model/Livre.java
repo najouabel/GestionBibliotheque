@@ -7,8 +7,8 @@ public class Livre {
     private String titre;
     private String auteur;
 
-    private Statut statut = Statut.valueOf("Disponible");
-    public enum Statut { Disponible, Emprunte, Perdu }
+    private Statut statut = Statut.disponible;
+    public enum Statut { disponible, emprunte, perdu }
 
     public Livre() {
     }

@@ -1,5 +1,6 @@
 import java.sql.Connection;
 import Service.Menu;
+import Service.ServiceEmprunt;
 import Service.ServiceLivre;
 
 public class Main {
@@ -10,7 +11,9 @@ public class Main {
         } else {
             System.out.println("Connection success");
             ServiceLivre serviceLivre = new ServiceLivre();
-            Menu menu = new Menu(serviceLivre);
+            ServiceEmprunt serviceEmprunt = new ServiceEmprunt();
+
+            Menu menu = new Menu(serviceLivre, serviceEmprunt);
             menu.displayMenu();
         }
     }

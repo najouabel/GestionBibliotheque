@@ -1,5 +1,8 @@
 package Interface;
 
-public interface InterfaceEmprunteur {
+import Model.Emprunteur;
 
+public interface InterfaceEmprunteur {
+    Emprunteur ajouterEmprunteur(Emprunteur emprunteur);
+    boolean emprunteurExiste(int numeroMembre);
 }

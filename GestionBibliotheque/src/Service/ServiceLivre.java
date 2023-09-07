@@ -2,10 +2,8 @@ package Service;
 
 import Interface.InterfaceLivre;
 import Model.Livre;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+
+import java.sql.*;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -59,7 +57,7 @@ public class ServiceLivre implements InterfaceLivre {
                 PreparedStatement preparedStatement = con.prepareStatement(query);
                 preparedStatement.setString(1, livre.getTitre());
                 preparedStatement.setString(2, livre.getAuteur());
-                preparedStatement.setString(3, livre.getStatut() != null ? livre.getStatut().name() : "DefaultStatut");
+                preparedStatement.setString(3, livre.getStatut().name());
                 preparedStatement.setString(4, livre.getIsbn());
                 preparedStatement.executeUpdate();
 
@@ -149,7 +147,7 @@ public class ServiceLivre implements InterfaceLivre {
             if (con == null) {
                 return null;
             } else {
-                String query = "SELECT * FROM livre WHERE statut = 'emprunter';";
+                String query = "SELECT * FROM livre WHERE statut = 'emprunte'";
 
                 try {
                     PreparedStatement preparedStatement = con.prepareStatement(query);
@@ -160,6 +158,8 @@ public class ServiceLivre implements InterfaceLivre {
                         livre.setIsbn(resultSet.getString("isbn"));
                         livre.setTitre(resultSet.getString("titre"));
                         livre.setAuteur(resultSet.getString("auteur"));
+                        String statut = resultSet.getString("statut").toLowerCase();
+                        livre.setStatut(Livre.Statut.valueOf(statut));
                         livreempruntes.add(livre);
                     }
 
@@ -249,13 +249,12 @@ public class ServiceLivre implements InterfaceLivre {
     }
 
     @Override
-    public Livre rechercherlivre(String isbn) {
+    public Livre rechercherLivreParIsbn(String isbn) {
         Connection con = Database.DBconnection.getConnection();
         if (con == null) {
             return null;
         } else {
-            String query = "SELECT * FROM livre WHERE isbn = ? ;";
-
+            String query = "SELECT * FROM livre WHERE isbn = ?";
             try {
                 PreparedStatement preparedStatement = con.prepareStatement(query);
                 preparedStatement.setString(1, isbn);
@@ -283,5 +282,41 @@ public class ServiceLivre implements InterfaceLivre {
             }
         }
     }
+
+    @Override
+    public Livre rechercherLivreParTitre(String titre) {
+        Connection con = Database.DBconnection.getConnection();
+        if (con == null) {
+            return null;
+        } else {
+            String query = "SELECT * FROM livre WHERE titre = ?";
+            try {
+                PreparedStatement preparedStatement = con.prepareStatement(query);
+                preparedStatement.setString(1, titre);
+
+                ResultSet resultSet = preparedStatement.executeQuery();
+                if (resultSet.next()) {
+                    Livre livre = new Livre();
+                    livre.setIsbn(resultSet.getString("isbn"));
+                    livre.setTitre(resultSet.getString("titre"));
+                    livre.setAuteur(resultSet.getString("auteur"));
+
+                    return livre;
+                } else {
+                    return null;
+                }
+            } catch (SQLException se) {
+                se.printStackTrace();
+                return null;
+            } finally {
+                try {
+                    con.close();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        }
+    }
+
 }
 
