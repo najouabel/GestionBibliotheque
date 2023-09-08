@@ -66,22 +66,29 @@ public class ServiceEmprunt implements InterfaceEmprunt {
                     java.util.Date currentDate = new java.util.Date();
                     java.sql.Date sqlCurrentDate = new java.sql.Date(currentDate.getTime());
 
+                    java.util.Calendar calendar = java.util.Calendar.getInstance();
+                    calendar.setTime(currentDate);
+                    calendar.add(java.util.Calendar.DAY_OF_MONTH, 15);
+                    java.util.Date returnDate = calendar.getTime();
+
+                    java.sql.Date returndate = new java.sql.Date(returnDate.getTime());
+
                     emprunt.setDate_emprunt(sqlCurrentDate);
-                    emprunt.setDate_retour(null);
+                    emprunt.setDate_retour(returndate);
 
                     String insertQuery = "INSERT INTO emprunt (Numero_membre, livre_isbn, date_emprunt, date_retour) VALUES (?, ?, ?, ?);";
                     PreparedStatement insertStatement = con.prepareStatement(insertQuery);
                     insertStatement.setInt(1, emprunteur.getNumero_membre());
                     insertStatement.setString(2, livre.getIsbn());
                     insertStatement.setDate(3, sqlCurrentDate);
-                    insertStatement.setNull(4, java.sql.Types.DATE);
+                    insertStatement.setDate(4, returndate);
                     insertStatement.executeUpdate();
 
-                    String updateQuery = "UPDATE livre SET statut = ? WHERE isbn = ?";
+                   /* String updateQuery = "UPDATE livre SET statut = ? WHERE isbn = ?";
                     PreparedStatement updateStatement = con.prepareStatement(updateQuery);
                     updateStatement.setString(1, "emprunte");
                     updateStatement.setString(2, livre.getIsbn());
-                    updateStatement.executeUpdate();
+                    updateStatement.executeUpdate();*/
 
                     return emprunt;
                 } catch (SQLException se) {
@@ -125,11 +132,11 @@ public class ServiceEmprunt implements InterfaceEmprunt {
                     deleteStatement.executeUpdate();
 
 
-                    String update = "UPDATE livre SET statut = ? WHERE isbn = ?";
+                    /* String update = "UPDATE livre SET statut = ? WHERE isbn = ?";
                     PreparedStatement updateStatement = con.prepareStatement(update);
                     updateStatement.setString(1, "disponible");
                     updateStatement.setString(2, livre.getIsbn());
-                    updateStatement.executeUpdate();
+                    updateStatement.executeUpdate();*/
 
                     return emprunt;
                 }
@@ -147,6 +154,33 @@ public class ServiceEmprunt implements InterfaceEmprunt {
             }
         }
     }
+@Override
+    public void updatestatus() {
+        Connection con = Database.DBconnection.getConnection();
+        if (con == null) {
+            return;
+        } else {
+            try {
+                java.util.Date currentDate = new java.util.Date();
+                java.sql.Date sqlCurrentDate = new java.sql.Date(currentDate.getTime());
 
+                String updateQuery = "UPDATE livre l " +
+                                     "INNER JOIN emprunt e ON l.isbn = e.livre_isbn " +
+                                     "SET l.statut = 'perdu' " +
+                                     "WHERE e.date_retour < ?";
+                PreparedStatement updateStatement = con.prepareStatement(updateQuery);
+                updateStatement.setDate(1, sqlCurrentDate);
+                updateStatement.executeUpdate();
+            } catch (SQLException se) {
+                se.printStackTrace();
+            } finally {
+                try {
+                    con.close();
+                } catch (SQLException throwables) {
+                    throwables.printStackTrace();
+                }
+            }
+        }
+    }
 
 }

@@ -12,8 +12,9 @@ public class Main {
             System.out.println("Connection success");
             ServiceLivre serviceLivre = new ServiceLivre();
             ServiceEmprunt serviceEmprunt = new ServiceEmprunt();
-
+            serviceEmprunt.updatestatus();
             Menu menu = new Menu(serviceLivre, serviceEmprunt);
+
             menu.displayMenu();
         }
     }

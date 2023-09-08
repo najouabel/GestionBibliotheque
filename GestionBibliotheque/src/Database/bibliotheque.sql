@@ -37,37 +37,18 @@ CREATE TRIGGER emprunt_livre
     FOR EACH ROW
 BEGIN
     UPDATE livre
-    SET statut = 'emprunté'
+    SET statut = 'emprunte'
     WHERE isbn = NEW.livre_isbn;
 END;
 
-CREATE TRIGGER perte_livre
-    AFTER INSERT ON emprunt
-    FOR EACH ROW
-BEGIN
-    DECLARE date_emprunt DATE;
-    DECLARE date_retour_prevue DATE;
-    DECLARE duree_emprunt INT;
-
-    SELECT NEW.date_emprunt, DATE_ADD(NEW.date_emprunt, INTERVAL 15 DAY) INTO date_emprunt, date_retour_prevue;
-
-    SET duree_emprunt = DATEDIFF(date_retour_prevue, NEW.date_emprunt);
-
-    IF NEW.date_retour IS NULL AND duree_emprunt >= 15 THEN
-    UPDATE livre
-    SET statut = 'perdu'
-    WHERE isbn = NEW.livre_isbn;
-END IF;
-END;
 
 
 CREATE TRIGGER retour_livre
-    AFTER UPDATE ON emprunt
+    AFTER DELETE ON emprunt
     FOR EACH ROW
 BEGIN
-    IF NEW.date_retour IS NOT NULL THEN
+
     UPDATE livre
     SET statut = 'disponible'
-    WHERE isbn = NEW.livre_isbn;
-END IF;
+    WHERE isbn = OLD.livre_isbn;
 END;

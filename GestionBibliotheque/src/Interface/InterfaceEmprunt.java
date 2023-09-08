@@ -7,4 +7,5 @@ import Model.Livre;
 public interface InterfaceEmprunt {
     Emprunt enregistrerEmprunt(Livre livre, Emprunteur emprunteur);
     Emprunt retournerEmprunt(Livre livre, Emprunteur emprunteur);
+    void updatestatus();
 }
